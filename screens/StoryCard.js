@@ -39,10 +39,21 @@ export default class StoryCard extends Component {
     if (!this.state.fontsLoaded) {
       return <AppLoading />;
     } else {
-      return (
+
+/*Para usar essa navigation em nosso componente <StoryCard>, teremos que usar um componente
+<TouchableOpacity> para envolver o conteúdo do nosso cartão dentro dele e realizar a navegação no evento
+onPress do nosso componente <TouchableOpacity>.*/
+
+return (
         <TouchableOpacity
           style={styles.container}
           onPress={() =>
+
+/*Aqui, em vez de uma view, estamos usando um <TouchableOpacity> como nosso
+contêiner. Em nossa prop onPress do TouchableOpacity, estamos chamando
+this.props.navigation.navigate() para navegar até a StoryScreen, e então pssamos
+nosso this.props.story para ela como uma prop chamada story.*/
+
             this.props.navigation.navigate("Tela de Histórias", {
               story: this.props.story
             })

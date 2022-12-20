@@ -22,6 +22,13 @@ let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
 };
 
+/*Aqui, no constructor, adicionaremos isEnabled (está ativado) para o botão de
+alternância que vamos criar para alternar entre os temas.
+Também temos light_theme (tema claro) definido como true por padrão. Isso garantirá
+que o aplicativo inicialmente tenha um tema claro. Em seguida, temos name (nome)
+como strings vazias no estado para armazenar dados do Firebase usando o comando
+fetchUser (buscar usuário).*/
+
 export default class Profile extends Component {
   constructor(props) {
     super(props);
@@ -33,9 +40,17 @@ export default class Profile extends Component {
     };
   }
 
+/*, estamos usando uma função toggleSwitch() para o evento onPress*/
+
   toggleSwitch() {
     const previous_state = this.state.isEnabled;
     const theme = !this.state.isEnabled ? "dark" : "light";
+
+/*estamos verificando o tema para o qual o usuário alternou — se é escuro ou claro. Com
+base nisso, estamos criando um objeto updates (atualizações) com a referência do usuário no
+banco de dados como chave e o tema escolhido como valor A partir disso, estamos atualizando 
+seu tema preferido no banco de dados e alterando o estado*/
+
     var updates = {};
     updates[
       "/users/" + firebase.auth().currentUser.uid + "/current_theme"
@@ -57,6 +72,10 @@ export default class Profile extends Component {
     this.fetchUser();
   }
 
+/*função fetchUser() para ser chamada em nossa função
+componentDidMount(). Essa função busca o usuário para nós com base em seu id
+exclusivo (unique id) que podemos encontrar no firebase.auth().currentUser.uid.*/
+
   async fetchUser() {
     let theme, name, image;
     await firebase
@@ -77,6 +96,9 @@ export default class Profile extends Component {
     if (this.state.fontsLoaded) {
       SplashScreen.hideAsync();
       return (
+/*Para o botão de alternância que vamos usar para selecionar os temas, você pode usar o componente
+<Switch> do react-native.*/
+
         <View style={styles.container}>
           <SafeAreaView style={styles.droidSafeArea} />
           <View style={styles.appTitle}>
@@ -104,6 +126,13 @@ export default class Profile extends Component {
                 style={{
                   transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }]
                 }}
+
+/*estamos usando a imagem de perfil e o nome do usuário. Também estamos
+usando o componente <Switch> para alternar entre os temas.
+Neste componente, o atributo trackColor é usado para a cor da trilha (ToggleSwitch –
+botão de alternância) quando for true ou false. Da mesma forma, thumbColor é a cor
+do círculo no botão de alternância*/
+
                 trackColor={{ false: "#767577", true: "white" }}
                 thumbColor={this.state.isEnabled ? "#ee8249" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
@@ -120,6 +149,8 @@ export default class Profile extends Component {
     return<></>
   }
 }
+
+/*estilos*/
 
 const styles = StyleSheet.create({
   container: {

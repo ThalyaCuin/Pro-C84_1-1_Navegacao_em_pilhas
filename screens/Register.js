@@ -46,13 +46,29 @@ export default class RegisterScreen extends Component {
     this._loadFontsAsync();
   }
  
+/*/*cadastrar um usuário.defina um método chamado registerUser. Terá 5 parâmetros: email,password, 
+confirm_password, first_name e last_name.*/
+
  registerUser = (email, password,confirmPassword,first_name,last_name) => {
   if(password==confirmPassword){
+
+/*/*Então, se a senha corresponder, vamos escrever o código para registrar o
+usuário com o método firebase createUserWithEmailAndPassword().*/
+
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
         Alert.alert("Usuário registrado!");
+
+/*irá cadastrar o usuário com e-mail e senha. Sempre que um novo usuário é criado, o novo 
+usuário recebe um uid exclusivo.Podemos buscar esse uid:
+Usaremos o uis para armazenar os dados de nossos usuários no banco de dados. Aqui, armazenaremos:
+i. Identificação do email
+ii. Nome
+iii. Sobrenome
+iv. Tema atual.*/
+        
         console.log(userCredential.user.uid)
         this.props.navigation.replace("Login");
         firebase.database().ref("/users/" + userCredential.user.uid)
@@ -67,6 +83,9 @@ export default class RegisterScreen extends Component {
         Alert.alert(error.message);
       });
     }else{
+
+/*adicionaremos uma instrução condicional que verificará se senha e confirm_password correspondem ou não.*/
+
       Alert.alert("As senhas não são iguais");
     }
   };
@@ -76,7 +95,13 @@ export default class RegisterScreen extends Component {
     if (this.state.fontsLoaded) {
       SplashScreen.hideAsync();
       const { email, password, confirmPassword, first_name, last_name } = this.state;
-      
+ 
+/* Já temos dois TextInputs que recebem o e-mail e a senha como entrada.
+Precisamos de mais três TextInputs para inserir first_name, last_name e
+confirm_password para o processo de cadastro.
+Quando nos registramos em qualquer aplicativo, inserimos duas vezes para
+garantir que a senha esteja correta.*/      
+
       return (
         <View style={styles.container}>
           <SafeAreaView style={styles.droidSafeArea} />
@@ -120,11 +145,17 @@ export default class RegisterScreen extends Component {
             />
             <TouchableOpacity
               style={[styles.button, { marginTop: 20 }]}
+
+/*chamaremos o método registerUser*/
+
               onPress={() => this.registerUser(email, password, confirmPassword,first_name,last_name)}
             >
               <Text style={styles.buttonText}>Registrar</Text>
             </TouchableOpacity>    
             <TouchableOpacity
+
+/*levará o usuário de volta para a LoginScreen.*/
+
               onPress={()=>this.props.navigation.replace("Login")}
             >
               <Text style={styles.buttonTextNewUser}>Login</Text>

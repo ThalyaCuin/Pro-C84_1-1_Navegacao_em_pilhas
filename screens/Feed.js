@@ -38,6 +38,13 @@ export default class Feed extends Component {
     this._loadFontsAsync();
   }
 
+/*Agora vamos pensar um pouco. Queremos acessar a StoryScreen (tela de histórias) pela nossa tela
+Feed, mas nossos cartões estão no StoryCard.js (cartão de história).
+teremos acesso às props de navegação na Tela de Feed, mas queremos que a navegação aconteça
+no StoryCard. Portanto, teremos que passá-lo para o componente.
+Dessa forma, estamos passando nossas props de navegação como navigation para nosso componente
+<StoryCard>.*/
+
   renderItem = ({ item: story }) => {
     return <StoryCard story={story} navigation={this.props.navigation} />;
   };

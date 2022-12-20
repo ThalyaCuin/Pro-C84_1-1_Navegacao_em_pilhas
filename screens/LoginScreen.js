@@ -44,13 +44,24 @@ export default class LoginScreen extends Component {
     this._loadFontsAsync();
   }
 
+/*definir a função singIn(), que vai ajudar o usuário a entrar. Vamos
+usar o método signInWithEmailAndPassword() para isso*/
+
   signIn = async (email, password) => {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
+
+/*usamos o método .replace() em vez do método .navigate(). Isso
+garantirá que, após o login, não possamos voltar à página de login ao clicar no
+botão Voltar.*/
+
         this.props.navigation.replace("Dashboard");
       })
+
+/*Também adicionamos a função .catch() para retornar mensagens de erro*/
+
       .catch(error => {
         Alert.alert(error.message);
       });
@@ -84,12 +95,18 @@ export default class LoginScreen extends Component {
             secureTextEntry
           />
           <TouchableOpacity
+
+/*chame a função sinGIn() quando o botão de login for clicado.*/
+
             style={[styles.button, { marginTop: 20 }]}
             onPress={() => this.signIn(email, password)}
           >
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+
+          <TouchableOpacity /*adicionar outro TouchableOpacity que permitirá que o usuário vá para
+                                          RegisterScreen quando for um novo usuário.*/
+
             onPress={() => this.props.navigation.navigate("RegisterScreen")}
           >
             <Text style={styles.buttonTextNewUser}>Usuário novo?</Text>
