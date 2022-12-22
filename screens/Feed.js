@@ -14,6 +14,7 @@ import StoryCard from "./StoryCard";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import { FlatList } from "react-native-gesture-handler";
+/*Vamos primeiramente importar o módulo firebase:*/
 import firebase from "firebase";
 
 let customFonts = {

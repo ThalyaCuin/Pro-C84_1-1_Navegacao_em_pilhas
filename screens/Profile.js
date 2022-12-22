@@ -19,6 +19,13 @@ let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
 };
 
+/*Aqui, no construtor, adicionaremos isEnabled (está ativado) para o botão de
+alternância que vamos criar para alternar entre os temas.
+Também temos light_theme (tema claro) definido como true por padrão. Isso garantirá
+que o aplicativo inicialmente tenha um tema claro. Em seguida, temos name (nome)
+como strings vazias no estado para armazenar dados do Firebase usando o comando
+fetchUser (buscar usuário).*/
+
 export default class Profile extends Component {
   constructor(props) {
     super(props);
@@ -31,9 +38,19 @@ export default class Profile extends Component {
     };
   }
 
+/*, estamos usando uma função toggleSwitch()(alternar interruptor) para o evento onPress*/
+
+
   toggleSwitch() {
     const previous_state = this.state.isEnabled;
     const theme = !this.state.isEnabled ? "dark" : "light";
+
+/*estamos verificando o tema para o qual o usuário alternou — se é escuro ou claro. Com
+base nisso, estamos criando um objeto updates (atualizações) com a referência do usuário no
+banco de dados como chave e o tema escolhido como valor A partir disso, estamos atualizando 
+seu tema preferido no banco de dados e alterando o estado*/
+
+
     var updates = {};
     updates[
       "/users/" + firebase.auth().currentUser.uid + "/current_theme"
@@ -54,6 +71,10 @@ export default class Profile extends Component {
     this._loadFontsAsync();
     this.fetchUser();
   }
+
+/*função fetchUser() para ser chamada em nossa função
+componentDidMount(). Essa função busca o usuário para nós com base em seu id
+exclusivo (unique id) que podemos encontrar no firebase.auth().currentUser.uid.*/
 
   async fetchUser() {
     let theme, name, image;
@@ -78,7 +99,12 @@ export default class Profile extends Component {
       return <AppLoading />;
     } else {
       return (
+
+/*Para o botão de alternância que vamos usar para selecionar os temas, você pode usar o componente
+<Switch> do react-native.*/
+
         <View
+/*mudar a primeira view para o tema branco*/
           style={
             this.state.light_theme ? styles.containerLight : styles.container
           }
@@ -132,6 +158,13 @@ export default class Profile extends Component {
 
               <Switch
                 style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}
+
+/*estamos usando a imagem de perfil e o nome do usuário. Também estamos
+usando o componente <Switch> para alternar entre os temas.
+Neste componente, o atributo trackColor é usado para a cor da trilha (ToggleSwitch –
+botão de alternância) quando for true ou false. Da mesma forma, thumbColor é a cor
+do círculo no botão de alternância*/
+
                 trackColor={{
                   false: "#767577",
                   true: this.state.light_theme ? "#eee" : "white"
@@ -156,6 +189,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#15193c"
   },
+
+/*adicionar esse estilo para conseguir alterar o tema de fundo pra branco*/
+
   containerLight: {
     flex: 1,
     backgroundColor: "white"

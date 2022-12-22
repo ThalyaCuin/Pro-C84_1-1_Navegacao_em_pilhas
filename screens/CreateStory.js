@@ -21,6 +21,9 @@ let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
 };
 
+/* (visualizar imagem) com image_1 como o valor. Isso ocorre porque queremos manter a primeira 
+imagem sendo visualizada por padrão.*/
+
 export default class CreateStory extends Component {
   constructor(props) {
     super(props);
@@ -34,6 +37,9 @@ export default class CreateStory extends Component {
 
   async _loadFontsAsync() {
     await Font.loadAsync(customFonts);
+
+/*Agora, uma vez que o valor do menu suspenso for alterado, ele chamará a função setState() (definir estado),
+que renderizará novamente a tela inteira.*/
     this.setState({ fontsLoaded: true });
   }
 
@@ -53,6 +59,10 @@ export default class CreateStory extends Component {
       });
   };
 
+/*dentro da condição else, adicionaremos um dicionário
+preview_images com a chave como image_1, image_2, image_3, image_4 e
+image_5. Os valores serão os respectivos caminhos das imagens.*/
+
   render() {
     if (!this.state.fontsLoaded) {
       return <AppLoading />;
@@ -64,6 +74,8 @@ export default class CreateStory extends Component {
         image_4: require("../assets/story_image_4.png"),
         image_5: require("../assets/story_image_5.png")
       };
+
+/*Por fim, adicionaremos um scroll view em nossa tela contendo o código para visualizar a imagem:*/
       return (
         <View
           style={
@@ -91,22 +103,31 @@ export default class CreateStory extends Component {
             </View>
           </View>
           <View style={styles.fieldsContainer}>
-            <ScrollView>
+            <ScrollView> 
               <Image
                 source={preview_images[this.state.previewImage]}
                 style={styles.previewImage}
+/*Usamos um scrollview porque, mais tarde, mais campos de entrada serão adicionados.
+Temos então uma tag <Image> que exibe a visualização prévia da imagem do estado.*/
               ></Image>
 
               <View style={{ height: RFValue(this.state.dropdownHeight) }}>
                 <DropDownPicker
                   items={[
+/*é nosso menu suspenso. Especificamos as opções do menu suspenso 
+com a ajuda do atributo items */
                     { label: "Imagem 1", value: "image_1" },
                     { label: "Imagem 2", value: "image_2" },
                     { label: "Imagem 3", value: "image_3" },
                     { label: "Imagem 4", value: "image_4" },
                     { label: "Imagem 5", value: "image_5" }
                   ]}
+/*e demos a ele o valor padrão com o atributo defaultValue.*/
                   defaultValue={this.state.previewImage}
+
+/*Damos alguns estilos ao container no qual as opções serão exibidas ao clicar no menu
+suspenso com o atributo*/
+
                   containerStyle={{
                     height: 40,
                     borderRadius: RFValue(20),
@@ -119,11 +140,17 @@ export default class CreateStory extends Component {
                   onClose={() => {
                     this.setState({ dropdownHeight: 40 });
                   }}
+/*cor do plano de fundo como transparente porque queremos que o campo do menu suspenso tenha a 
+mesma cor do plano de fundo.*/
                   style={{ backgroundColor: "transparent" }}
                   itemStyle={{
                     justifyContent: "flex-start"
                   }}
                   dropDownStyle={{
+
+/*Da mesma forma, demos estilo ao menu suspenso com a ajuda do atributo
+dropDownStyle e também definimos os estilos para os rótulos e as setas com os
+atributos labelStyle e arrowStyle.*/
                     backgroundColor: this.state.light_theme ? "#eee" : "#2f345d"
                   }}
                   labelStyle={
@@ -136,6 +163,8 @@ export default class CreateStory extends Component {
                       ? styles.dropdownLabelLight
                       : styles.dropdownLabel
                   }
+/*Adicionamos um atributo onChangeItem no qual alteramos o estado previewImage
+para a opção recém-selecionada.*/
                   onChangeItem={item =>
                     this.setState({
                       previewImage: item.value
@@ -150,6 +179,17 @@ export default class CreateStory extends Component {
                       ? styles.inputFontLight
                       : styles.inputFont
                   }
+
+/*Aqui, dentro do <ScrollView>, adicionamos mais 4 visualizações com <TextInput>
+dentro. Essas entradas de texto contêm os estilos.
+Eles também contêm um atributo onChangeText, que define seu valor como um estado.
+Usamos o atributo placeholder (espaço reservado) para definir os espaços reservados e
+especificamos se a caixa de texto específica é multiline (possui múltiplas linhas) ou não.
+Se for, definimos o número de linhas com o atributo numberOfLines (número de linhas)
+e, finalmente, definimos a cor dos espaços reservados com o atributo
+placeholderTextColor (cor do texto do espaço reservado).
+Também adicionamos os estilos relevantes para eles:*/
+
                   onChangeText={title => this.setState({ title })}
                   placeholder={"Title"}
                   placeholderTextColor={
