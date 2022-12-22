@@ -51,7 +51,9 @@ export default class Feed extends Component {
         this.setState({ light_theme: theme === "light" });
       });
   };
-
+  
+/*Dessa forma, estamos passando nossas props de navegação como navigation para nosso componente
+<StoryCard>.*/
   renderItem = ({ item: story }) => {
     return <StoryCard story={story} navigation={this.props.navigation} />;
   };

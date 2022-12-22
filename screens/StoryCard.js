@@ -1,3 +1,8 @@
+/*Primeiro temos as instruções de importação para esta tela. A maioria das importações
+são semelhantes às do componente StoryCard, mas podemos notar que também
+importamos Ionicons desta vez.
+*/
+
 import React, { Component } from "react";
 import {
   View,
@@ -13,6 +18,16 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { RFValue } from "react-native-responsive-fontsize";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
+
+/*Podemos ver que definimos as fontes, como na tela anterior.
+Então criamos nosso componente de classe StoryScreen e, dentro dele, adicionamos
+um constructor — uma função para carregar nossas fontes e nossa função
+componentDidMount(). Estas são as coisas que temos novamente, que foram feitas
+anteriormente em outras telas.
+Uma novidade aqui são os 2 estados novos — speakerColor (cor do alto-falante)
+definido como gray (cinza) e speakerIcon (ícone do alto-falante) definido como
+'volume-high-outline'.
+Isso é para o ícone do alto-falante que temos em nosso resultado.*/
 
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
