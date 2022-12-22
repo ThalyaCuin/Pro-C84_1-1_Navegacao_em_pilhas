@@ -1,7 +1,3 @@
-/*Primeiro temos as instruções de importação para esta tela. A maioria das importações
-são semelhantes às do componente StoryCard, mas podemos notar que também
-importamos Ionicons desta vez.*/
-
 import React, { Component } from "react";
 import {
   View,
@@ -21,27 +17,20 @@ import * as Speech from "expo-speech";
 
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
+import firebase from "firebase";
 
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
 };
-
-/*Então criamos nosso componente de classe StoryScreen e, dentro dele, adicionamos
-um constructor — uma função para carregar nossas fontes e nossa função
-componentDidMount().*/
 
 export default class StoryScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       fontsLoaded: false,
-
-/*Uma novidade aqui são os 2 estados novos — speakerColor (cor do alto-falante)
-definido como gray (cinza) e speakerIcon (ícone do alto-falante) definido como
-'volume-high-outline'. Isso é para o ícone do alto-falante que temos em nosso resultado.*/
-
       speakerColor: "gray",
-      speakerIcon: "volume-high-outline"
+      speakerIcon: "volume-high-outline",
+      light_theme: true
     };
   }
 
@@ -52,20 +41,19 @@ definido como gray (cinza) e speakerIcon (ícone do alto-falante) definido como
 
   componentDidMount() {
     this._loadFontsAsync();
+    this.fetchUser();
   }
 
-/*Aqui, já que queremos mudar a cor do nosso ícone do alto-falante, estamos colocando o
-estado atual de speakerColor (cor do alto falante) em uma constante current_color
-(cor atual) e, com base em seu valor, configuramos o estado. Isso irá renderizar a tela
-imediatamente com um ícone de alto-falante de cor diferente.
-Em seguida, verificamos se current_color é gray (cinza). Fazemos isso porque, se a
-cor atual for cinza, significa que o usuário ativou a conversão de texto em fala. Observe
-que current_color é a cor do ícone antes de ser pressionado pelo usuário.
-Neste caso, estamos usando a função Speech.speak() com o texto dentro dela que
-queremos que ela fale.
-Se, porém, a cor não for gray (cinza), significa que o usuário quer desativá-la, então
-chamamos Speech.stop() para que, se ela ainda tiver algo a falar, possa parar
-imediatamente.*/
+  fetchUser = () => {
+    let theme;
+    firebase
+      .database()
+      .ref("/users/" + firebase.auth().currentUser.uid)
+      .on("value", snapshot => {
+        theme = snapshot.val().current_theme;
+        this.setState({ light_theme: theme === "light" });
+      });
+  };
 
   async initiateTTS(title, author, story, moral) {
     const current_color = this.state.speakerColor;
@@ -89,7 +77,11 @@ imediatamente.*/
       return <AppLoading />;
     } else {
       return (
-        <View style={styles.container}>
+        <View
+          style={
+            this.state.light_theme ? styles.containerLight : styles.container
+          }
+        >
           <SafeAreaView style={styles.droidSafeArea} />
           <View style={styles.appTitle}>
             <View style={styles.appIcon}>
@@ -99,45 +91,67 @@ imediatamente.*/
               ></Image>
             </View>
             <View style={styles.appTitleTextContainer}>
-              <Text style={styles.appTitleText}>App Narração de Histórias</Text>
+              <Text
+                style={
+                  this.state.light_theme
+                    ? styles.appTitleTextLight
+                    : styles.appTitleText
+                }
+              >
+                App Narração de Histórias
+              </Text>
             </View>
           </View>
           <View style={styles.storyContainer}>
-            <ScrollView style={styles.storyCard}>
+            <ScrollView
+              style={
+                this.state.light_theme
+                  ? styles.storyCardLight
+                  : styles.storyCard
+              }
+            >
               <Image
                 source={require("../assets/story_image_1.png")}
                 style={styles.image}
               ></Image>
-
               <View style={styles.dataContainer}>
                 <View style={styles.titleTextContainer}>
-                  <Text style={styles.storyTitleText}>
+                  <Text
+                    style={
+                      this.state.light_theme
+                        ? styles.storyTitleTextLight
+                        : styles.storyTitleText
+                    }
+                  >
                     {this.props.route.params.story.title}
                   </Text>
-                  <Text style={styles.storyAuthorText}>
+                  <Text
+                    style={
+                      this.state.light_theme
+                        ? styles.storyAuthorTextLight
+                        : styles.storyAuthorText
+                    }
+                  >
                     {this.props.route.params.story.author}
                   </Text>
-                  <Text style={styles.storyAuthorText}>
+                  <Text
+                    style={
+                      this.state.light_theme
+                        ? styles.storyAuthorTextLight
+                        : styles.storyAuthorText
+                    }
+                  >
                     {this.props.route.params.story.created_on}
                   </Text>
                 </View>
                 <View style={styles.iconContainer}>
                   <TouchableOpacity
-
-/*Primeiramente precisamos envolver nosso ícone em um TouchableOpacity para poder adicionar um evento 
-onPress a ele. Agora, para a conversão de texto em fala, queremos que ele fale:
-1. O título
-2. O nome do autor
-3. A história
-4. A moral da história
-Para isso, podemos chamar uma função beginTTS() no evento onPress e passar esses valores para ela*/
-
                     onPress={() =>
                       this.initiateTTS(
-                        this.props.route.params.story.title,
-                        this.props.route.params.story.author,
-                        this.props.route.params.story.story,
-                        this.props.route.params.story.moral
+                        this.props.route.params.title,
+                        this.props.route.params.author,
+                        this.props.route.params.story,
+                        this.props.route.params.moral
                       )
                     }
                   >
@@ -151,17 +165,42 @@ Para isso, podemos chamar uma função beginTTS() no evento onPress e passar ess
                 </View>
               </View>
               <View style={styles.storyTextContainer}>
-                <Text style={styles.storyText}>
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.storyTextLight
+                      : styles.storyText
+                  }
+                >
                   {this.props.route.params.story.story}
                 </Text>
-                <Text style={styles.moralText}>
-                  Moral - {this.props.route.params.story.moral}
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.moralTextLight
+                      : styles.moralText
+                  }
+                >
+                  Moral da História - {this.props.route.params.story.moral}
                 </Text>
               </View>
               <View style={styles.actionContainer}>
                 <View style={styles.likeButton}>
-                  <Ionicons name={"heart"} size={RFValue(30)} color={"white"} />
-                  <Text style={styles.likeText}>12k</Text>
+                  <Ionicons
+                    name={"heart"}
+                    size={RFValue(30)}
+                    color={this.state.light_theme ? "black" : "white"}
+                  />
+
+                  <Text
+                    style={
+                      this.state.light_theme
+                        ? styles.likeTextLight
+                        : styles.likeText
+                    }
+                  >
+                    12k
+                  </Text>
                 </View>
               </View>
             </ScrollView>
@@ -176,6 +215,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#15193c"
+  },
+  containerLight: {
+    flex: 1,
+    backgroundColor: "white"
   },
   droidSafeArea: {
     marginTop: Platform.OS === "android" ? StatusBar.currentHeight : RFValue(35)
@@ -203,6 +246,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(28),
     fontFamily: "Bubblegum-Sans"
   },
+  appTitleTextLight: {
+    color: "black",
+    fontSize: RFValue(28),
+    fontFamily: "Bubblegum-Sans"
+  },
   storyContainer: {
     flex: 1
   },
@@ -210,6 +258,19 @@ const styles = StyleSheet.create({
     margin: RFValue(20),
     backgroundColor: "#2f345d",
     borderRadius: RFValue(20)
+  },
+  storyCardLight: {
+    margin: RFValue(20),
+    backgroundColor: "white",
+    borderRadius: RFValue(20),
+    shadowColor: "rgb(0, 0, 0)",
+    shadowOffset: {
+      width: 3,
+      height: 3
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 2
   },
   image: {
     width: "100%",
@@ -231,10 +292,20 @@ const styles = StyleSheet.create({
     fontSize: RFValue(25),
     color: "white"
   },
+  storyTitleTextLight: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(25),
+    color: "black"
+  },
   storyAuthorText: {
     fontFamily: "Bubblegum-Sans",
     fontSize: RFValue(18),
     color: "white"
+  },
+  storyAuthorTextLight: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(18),
+    color: "black"
   },
   iconContainer: {
     flex: 0.2
@@ -247,10 +318,20 @@ const styles = StyleSheet.create({
     fontSize: RFValue(15),
     color: "white"
   },
+  storyTextLight: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(15),
+    color: "black"
+  },
   moralText: {
     fontFamily: "Bubblegum-Sans",
     fontSize: RFValue(20),
     color: "white"
+  },
+  moralTextLight: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(20),
+    color: "black"
   },
   actionContainer: {
     justifyContent: "center",
@@ -268,6 +349,11 @@ const styles = StyleSheet.create({
   },
   likeText: {
     color: "white",
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(25),
+    marginLeft: RFValue(5)
+  },
+  likeTextLight: {
     fontFamily: "Bubblegum-Sans",
     fontSize: RFValue(25),
     marginLeft: RFValue(5)
