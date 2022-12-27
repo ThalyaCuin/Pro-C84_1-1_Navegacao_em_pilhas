@@ -1,13 +1,9 @@
-/*Primeiro temos as instruções de importação para esta tela. A maioria das importações
-são semelhantes às do componente StoryCard, mas podemos notar que também
-importamos Ionicons desta vez.
-*/
-
 import React, { Component } from "react";
 import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
   Platform,
   StatusBar,
   Image,
@@ -18,16 +14,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { RFValue } from "react-native-responsive-fontsize";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
-
-/*Podemos ver que definimos as fontes, como na tela anterior.
-Então criamos nosso componente de classe StoryScreen e, dentro dele, adicionamos
-um constructor — uma função para carregar nossas fontes e nossa função
-componentDidMount(). Estas são as coisas que temos novamente, que foram feitas
-anteriormente em outras telas.
-Uma novidade aqui são os 2 estados novos — speakerColor (cor do alto-falante)
-definido como gray (cinza) e speakerIcon (ícone do alto-falante) definido como
-'volume-high-outline'.
-Isso é para o ícone do alto-falante que temos em nosso resultado.*/
+import firebase from "firebase";
 
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
@@ -37,7 +24,10 @@ export default class StoryCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fontsLoaded: false
+      fontsLoaded: false,
+      light_theme: true,
+      story_id: this.props.story.key,
+      story_data: this.props.story.value
     };
   }
 
@@ -48,53 +38,101 @@ export default class StoryCard extends Component {
 
   componentDidMount() {
     this._loadFontsAsync();
+    this.fetchUser();
   }
 
+  fetchUser = () => {
+    let theme;
+    firebase
+      .database()
+      .ref("/users/" + firebase.auth().currentUser.uid)
+      .on("value", snapshot => {
+        theme = snapshot.val().current_theme;
+        this.setState({ light_theme: theme === "light" });
+      });
+  };
+
   render() {
+    let story = this.state.story_data;
     if (!this.state.fontsLoaded) {
       return <AppLoading />;
     } else {
-
-/*Para usar essa navigation em nosso componente <StoryCard>, teremos que usar um componente
-<TouchableOpacity> para envolver o conteúdo do nosso cartão dentro dele e realizar a navegação no evento
-onPress do nosso componente <TouchableOpacity>.*/
-
-return (
+      let images = {
+        image_1: require("../assets/story_image_1.png"),
+        image_2: require("../assets/story_image_2.png"),
+        image_3: require("../assets/story_image_3.png"),
+        image_4: require("../assets/story_image_4.png"),
+        image_5: require("../assets/story_image_5.png")
+      };
+      return (
         <TouchableOpacity
           style={styles.container}
           onPress={() =>
-
-/*Aqui, em vez de uma view, estamos usando um <TouchableOpacity> como nosso
-contêiner. Em nossa prop onPress do TouchableOpacity, estamos chamando
-this.props.navigation.navigate() para navegar até a StoryScreen, e então pssamos
-nosso this.props.story para ela como uma prop chamada story.*/
-
             this.props.navigation.navigate("Tela de Histórias", {
               story: this.props.story
             })
           }
         >
-          <View style={styles.cardContainer}>
+          <SafeAreaView style={styles.droidSafeArea} />
+          <View
+            style={
+              this.state.light_theme
+                ? styles.cardContainerLight
+                : styles.cardContainer
+            }
+          >
             <Image
-              source={require("../assets/story_image_1.png")}
+              source={images[story.preview_image]}
               style={styles.storyImage}
             ></Image>
-
             <View style={styles.titleContainer}>
-              <Text style={styles.storyTitleText}>
-                {this.props.story.title}
-              </Text>
-              <Text style={styles.storyAuthorText}>
-                {this.props.story.author}
-              </Text>
-              <Text style={styles.descriptionText}>
-                {this.props.story.description}
-              </Text>
+              <View style={styles.titleTextContainer}>
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.storyTitleTextLight
+                      : styles.storyTitleText
+                  }
+                >
+                  {story.title}
+                </Text>
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.storyAuthorTextLight
+                      : styles.storyAuthorText
+                  }
+                >
+                  {story.author}
+                </Text>
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.descriptionTextLight
+                      : styles.descriptionText
+                  }
+                >
+                  {this.props.story.description}
+                </Text>
+              </View>
             </View>
+
             <View style={styles.actionContainer}>
               <View style={styles.likeButton}>
-                <Ionicons name={"heart"} size={RFValue(30)} color={"white"} />
-                <Text style={styles.likeText}>12k</Text>
+                <Ionicons
+                  name={"heart"}
+                  size={RFValue(30)}
+                  color={this.state.light_theme ? "black" : "white"}
+                />
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.likeTextLight
+                      : styles.likeText
+                  }
+                >
+                  12k
+                </Text>
               </View>
             </View>
           </View>
@@ -105,13 +143,26 @@ nosso this.props.story para ela como uma prop chamada story.*/
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
+  droidSafeArea: {
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : RFValue(35)
   },
   cardContainer: {
     margin: RFValue(13),
     backgroundColor: "#2f345d",
     borderRadius: RFValue(20)
+  },
+  cardContainerLight: {
+    margin: RFValue(13),
+    backgroundColor: "white",
+    borderRadius: RFValue(20),
+    shadowColor: "rgb(0, 0, 0)",
+    shadowOffset: {
+      width: 3,
+      height: 3
+    },
+    shadowOpacity: RFValue(0.5),
+    shadowRadius: RFValue(5),
+    elevation: RFValue(2)
   },
   storyImage: {
     resizeMode: "contain",
@@ -123,21 +174,44 @@ const styles = StyleSheet.create({
     paddingLeft: RFValue(20),
     justifyContent: "center"
   },
+  titleTextContainer: {
+    flex: 0.8
+  },
+  iconContainer: {
+    flex: 0.2
+  },
   storyTitleText: {
-    fontSize: RFValue(25),
     fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(25),
     color: "white"
   },
-  storyAuthorText: {
-    fontSize: RFValue(18),
+  storyTitleTextLight: {
     fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(25),
+    color: "black"
+  },
+  storyAuthorText: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(18),
     color: "white"
+  },
+  storyAuthorTextLight: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(18),
+    color: "black"
+  },
+  descriptionContainer: {
+    marginTop: RFValue(5)
   },
   descriptionText: {
     fontFamily: "Bubblegum-Sans",
-    fontSize: 13,
-    color: "white",
-    paddingTop: RFValue(10)
+    fontSize: RFValue(13),
+    color: "white"
+  },
+  descriptionTextLight: {
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(13),
+    color: "black"
   },
   actionContainer: {
     justifyContent: "center",
@@ -155,6 +229,11 @@ const styles = StyleSheet.create({
   },
   likeText: {
     color: "white",
+    fontFamily: "Bubblegum-Sans",
+    fontSize: RFValue(25),
+    marginLeft: RFValue(5)
+  },
+  likeTextLight: {
     fontFamily: "Bubblegum-Sans",
     fontSize: RFValue(25),
     marginLeft: RFValue(5)

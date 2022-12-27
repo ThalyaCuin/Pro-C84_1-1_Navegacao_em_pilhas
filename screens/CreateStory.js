@@ -9,7 +9,10 @@ import {
   Image,
   ScrollView,
   TextInput,
-  Dimensions
+  Dimensions,
+//adicionando 
+  Button,
+  Alert
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -46,6 +49,58 @@ que renderizará novamente a tela inteira.*/
   componentDidMount() {
     this._loadFontsAsync();
     this.fetchUser();
+  }
+
+/*precisamos que essa função salve a história no banco de dados.
+Vamos passar por esta função.
+Primeiramente, verificamos se todos os campos foram preenchidos ou não — título,
+descrição, história e moral da história. Estamos fazendo isso usando o operador and (&&).
+Se algum campo estiver vazio, damos um Alert dizendo que Todos os campos são
+obrigatórios! (Importe Alert na parte superior do "react-native").
+Em seguida, criamos um objeto storyData (dados da história) no qual estamos salvando
+os dados da história.Em seguida, estamos salvando esses dados no Firebase ao criar um ID exclusivo
+aleatório para registros/histórias que serão adicionadas ao nosso aplicativo. Estamos
+salvando a história dentro de um objeto de referência chamado posts.
+Então finalmente navegamos o usuário para a tela de feed.*/
+
+  async addStory() {
+    if (
+      this.state.title &&
+      this.state.description &&
+      this.state.story &&
+      this.state.moral
+    ) {
+      let storyData = {
+        preview_image: this.state.previewImage,
+        title: this.state.title,
+        description: this.state.description,
+        story: this.state.story,
+        moral: this.state.moral,
+        author: firebase.auth().currentUser.displayName,
+        created_on: new Date(),
+        author_uid: firebase.auth().currentUser.uid,
+        likes: 0
+      };
+      await firebase
+        .database()
+        .ref(
+          "/posts/" +
+            Math.random()
+              .toString(36)
+              .slice(2)
+        )
+        .set(storyData)
+        .then(function(snapshot) {});
+      this.props.setUpdateToTrue();
+      this.props.navigation.navigate("Feed");
+    } else {
+      Alert.alert(
+        "Error",
+        "Todos os campos são obrigatórios!",
+        [{ text: "OK", onPress: () => console.log("OK Pressionado") }],
+        { cancelable: false }
+      );
+    }
   }
 
   fetchUser = () => {
@@ -243,6 +298,17 @@ Também adicionamos os estilos relevantes para eles:*/
                   placeholderTextColor={
                     this.state.light_theme ? "black" : "white"
                   }
+/*Vamos começar adicionando o botão Enviar no arquivo Agora neste botão, temos um evento
+onPress() que chama uma função
+addStory() (adicionar história).
+*/
+                />
+              </View>
+              <View style={styles.submitButton}>
+                <Button
+                  onPress={() => this.addStory()}
+                  title="Submit"
+                  color="#841584"
                 />
               </View>
             </ScrollView>

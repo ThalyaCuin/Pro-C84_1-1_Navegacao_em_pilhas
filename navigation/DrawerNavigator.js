@@ -11,17 +11,33 @@ import Profile from "../screens/Profile";
 
 import Logout from "../screens/Logout";
 
+/*Nós adicionamos um atributo options (opções) aos componentes <Tab.Screen> e
+<Drawer.Screen>.
+Este atributo options está disponível para todos os componentes de tela do tipo de
+navegação. Nele, usamos um atributo específico unmountOnBlur e o configuramos como
+true para todas as telas. Este é o tipo de opção de tela mais usado, que desmonta a tela
+assim que o usuário a deixa.*/
+
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-
-/*adicionamos um novo componente <Drawer.Screen> para incluir o texto de Logout do arquivo Logout.js.*/
-
-    <Drawer.Navigator screenOptions={{headerShown:false}}>
-      <Drawer.Screen name="Tela Inicial" component={StackNavigator} />
-      <Drawer.Screen name="Perfil" component={Profile} />
-      <Drawer.Screen name="Logout" component={Logout} />
+    <Drawer.Navigator>
+      <Drawer.Screen
+        name="Tela Inicial"
+        component={StackNavigator}
+        options={{ unmountOnBlur: true }}
+      />
+      <Drawer.Screen
+        name="Perfil"
+        component={Profile}
+        options={{ unmountOnBlur: true }}
+      />
+      <Drawer.Screen
+        name="Logout"
+        component={Logout}
+        options={{ unmountOnBlur: true }}
+      />
     </Drawer.Navigator>
   );
 };
