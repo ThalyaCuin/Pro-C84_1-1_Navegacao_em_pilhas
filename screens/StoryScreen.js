@@ -55,19 +55,6 @@ export default class StoryScreen extends Component {
       });
   };
 
-/*Aqui, já que queremos mudar a cor do nosso ícone do alto-falante, estamos colocando o
-estado atual de speakerColor (cor do alto falante) em uma constante current_color
-(cor atual) e, com base em seu valor, configuramos o estado. Isso irá renderizar a tela
-imediatamente com um ícone de alto-falante de cor diferente.
-Em seguida, verificamos se current_color é gray (cinza). Fazemos isso porque, se a
-cor atual for cinza, significa que o usuário ativou a conversão de texto em fala. Observe
-que current_color é a cor do ícone antes de ser pressionado pelo usuário.
-Neste caso, estamos usando a função Speech.speak() com o texto dentro dela que
-queremos que ela fale.
-Se, porém, a cor não for gray (cinza), significa que o usuário quer desativá-la, então
-chamamos Speech.stop() para que, se ela ainda tiver algo a falar, possa parar
-imediatamente.*/
-
   async initiateTTS(title, author, story, moral) {
     const current_color = this.state.speakerColor;
     this.setState({
@@ -158,15 +145,7 @@ imediatamente.*/
                   </Text>
                 </View>
                 <View style={styles.iconContainer}>
-                  
                   <TouchableOpacity
-/*Primeiramente precisamos envolver nosso ícone em um TouchableOpacity para poder
-adicionar um evento onPress a ele.Agora, para a conversão de texto em fala, queremos que ele fale:
-1. O título
-2. O nome do autor
-3. A história
-4. A moral da história Para isso, podemos chamar uma função beginTTS() no evento onPress e passar 
-esses valores para ela.*/
                     onPress={() =>
                       this.initiateTTS(
                         this.props.route.params.title,

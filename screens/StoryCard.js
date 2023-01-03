@@ -27,7 +27,9 @@ export default class StoryCard extends Component {
       fontsLoaded: false,
       light_theme: true,
       story_id: this.props.story.key,
-      story_data: this.props.story.value
+      story_data: this.props.story.value,
+      is_liked: false,
+      likes: this.props.story.value.likes
     };
   }
 
@@ -40,6 +42,8 @@ export default class StoryCard extends Component {
     this._loadFontsAsync();
     this.fetchUser();
   }
+
+  likeAction = () => {};
 
   fetchUser = () => {
     let theme;
@@ -68,8 +72,8 @@ export default class StoryCard extends Component {
         <TouchableOpacity
           style={styles.container}
           onPress={() =>
-            this.props.navigation.navigate("Tela de Histórias", {
-              story: this.props.story
+            this.props.navigation.navigate("StoryScreen", {
+              story: story
             })
           }
         >
@@ -85,6 +89,7 @@ export default class StoryCard extends Component {
               source={images[story.preview_image]}
               style={styles.storyImage}
             ></Image>
+
             <View style={styles.titleContainer}>
               <View style={styles.titleTextContainer}>
                 <Text
@@ -118,12 +123,20 @@ export default class StoryCard extends Component {
             </View>
 
             <View style={styles.actionContainer}>
-              <View style={styles.likeButton}>
+              <TouchableOpacity
+                style={
+                  this.state.is_liked
+                    ? styles.likeButtonLiked
+                    : styles.likeButtonDisliked
+                }
+                onPress={() => this.likeAction()}
+              >
                 <Ionicons
                   name={"heart"}
                   size={RFValue(30)}
                   color={this.state.light_theme ? "black" : "white"}
                 />
+
                 <Text
                   style={
                     this.state.light_theme
@@ -131,9 +144,9 @@ export default class StoryCard extends Component {
                       : styles.likeText
                   }
                 >
-                  12k
+                  {this.state.likes}
                 </Text>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableOpacity>
@@ -144,7 +157,7 @@ export default class StoryCard extends Component {
 
 const styles = StyleSheet.create({
   droidSafeArea: {
-    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : RFValue(35)
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
   },
   cardContainer: {
     margin: RFValue(13),
@@ -218,7 +231,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: RFValue(10)
   },
-  likeButton: {
+  likeButtonLiked: {
     width: RFValue(160),
     height: RFValue(40),
     justifyContent: "center",
@@ -227,15 +240,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#eb3948",
     borderRadius: RFValue(30)
   },
+  likeButtonDisliked: {
+    width: RFValue(160),
+    height: RFValue(40),
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderColor: "#eb3948",
+    borderWidth: 2,
+    borderRadius: RFValue(30)
+  },
   likeText: {
     color: "white",
     fontFamily: "Bubblegum-Sans",
-    fontSize: RFValue(25),
-    marginLeft: RFValue(5)
+    fontSize: 25,
+    marginLeft: 25,
+    marginTop: 6
   },
   likeTextLight: {
     fontFamily: "Bubblegum-Sans",
-    fontSize: RFValue(25),
-    marginLeft: RFValue(5)
+    fontSize: 25,
+    marginLeft: 25,
+    marginTop: 6
   }
 });
